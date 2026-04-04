@@ -22,6 +22,7 @@ import { ProcessConfig } from '@process/utils/initStorage';
 import type { CronBusyGuard } from './CronBusyGuard';
 import type { CronJob } from './CronStore';
 import type { ICronJobExecutor } from './ICronJobExecutor';
+import { globalAgentSemaphore } from './GlobalAgentSemaphore';
 import { addMessage } from '@process/utils/message';
 import { getCronSkillDir, hasCronSkillFile } from './cronSkillFile';
 import { skillSuggestWatcher } from './SkillSuggestWatcher';
@@ -32,12 +33,22 @@ async function getConversationService() {
   return mod.conversationServiceSingleton;
 }
 
+/** Minimal interface for the semaphore used by WorkerTaskManagerJobExecutor (allows injection in tests). */
+export interface IAgentSemaphore {
+  acquire(): Promise<() => void>;
+}
+
 /** Executes cron jobs by delegating to WorkerTaskManager and tracking busy state via CronBusyGuard. */
 export class WorkerTaskManagerJobExecutor implements ICronJobExecutor {
+  private readonly semaphore: IAgentSemaphore;
+
   constructor(
     private readonly taskManager: IWorkerTaskManager,
-    private readonly busyGuard: CronBusyGuard
-  ) {}
+    private readonly busyGuard: CronBusyGuard,
+    semaphore?: IAgentSemaphore
+  ) {
+    this.semaphore = semaphore ?? globalAgentSemaphore;
+  }
 
   isConversationBusy(conversationId: string): boolean {
     return this.busyGuard.isProcessing(conversationId);
@@ -70,6 +81,11 @@ export class WorkerTaskManagerJobExecutor implements ICronJobExecutor {
 
     const msgId = uuid();
 
+    // Acquire a global semaphore slot before launching the agent.
+    // This queues the call if systemMaxConcurrency is already reached, bounding
+    // the total number of simultaneously active agent processes across all apps.
+    const releaseSemaphore = await this.semaphore.acquire();
+
     // Reuse existing task if possible; ensure yoloMode is active for scheduled runs.
     const existingTask = this.taskManager.getTask(conversationId);
     let task;
@@ -87,6 +103,8 @@ export class WorkerTaskManagerJobExecutor implements ICronJobExecutor {
         task = await this.taskManager.getOrBuildTask(conversationId, { yoloMode: true });
       }
     } catch (err) {
+      // Release the semaphore slot so the queue can proceed.
+      releaseSemaphore();
       // Conversation may have been deleted between scheduling and execution.
       // Re-throw with context so the caller (CronService) can log and update job state.
       throw new Error(
@@ -102,6 +120,10 @@ export class WorkerTaskManagerJobExecutor implements ICronJobExecutor {
     // Notify caller so it can register onceIdle callbacks while the conversation
     // is already marked busy (prevents premature idle fires).
     onAcquired?.();
+    // Release the global semaphore slot once the agent becomes idle.
+    // Registered after onAcquired so other onceIdle callbacks (e.g. notifications)
+    // are guaranteed to fire before we unblock the next queued launch.
+    this.busyGuard.onceIdle(conversationId, releaseSemaphore);
 
     const workspace = (task as { workspace?: string }).workspace;
     const workspaceFiles = workspace ? await copyFilesToDirectory(workspace, [], false) : [];
