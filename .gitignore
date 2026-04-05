@@ -203,7 +203,25 @@ dist-server/
 .omc/
 .superset/
 .claude/teams/aionui-ui-dev.json
-# Worktree directories (managed by protoLabs Studio)
-.automaker/
-.claude/worktrees/
+# Automaker runtime state — all instance-specific, not tracked
+# (context/ is intentionally NOT ignored — it contains agent coding standards)
 .automaker-lock
+.automaker/features/
+.automaker/memory/
+.automaker/knowledge.db
+.automaker/knowledge-eval.jsonl
+.automaker/settings.json
+.automaker/events/
+.automaker/projects/
+.automaker/quarantine/
+.automaker/recovery/
+.automaker/trajectory/
+.automaker/worktrees/
+.automaker/ledger/
+.automaker/checkpoints/
+.automaker/notifications.json
+.automaker/execution-state.json
+.automaker/actionable-items.json
+.automaker/.backups/
+.claude/worktrees/
+.worktrees/
