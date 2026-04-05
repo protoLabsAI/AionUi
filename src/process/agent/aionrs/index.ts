@@ -61,7 +61,7 @@ export class AionrsAgent {
       throw new Error('aionrs binary not found');
     }
 
-    const { args, env, projectConfig } = buildSpawnConfig(this.options.model, {
+    const { args, env, projectConfig } = await buildSpawnConfig(this.options.model, {
       workspace: this.options.workspace,
       maxTokens: this.options.maxTokens,
       maxTurns: this.options.maxTurns,

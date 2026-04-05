@@ -10,7 +10,14 @@ import type { OpenDialogOptions } from 'electron';
 import type { McpSource } from '../../process/services/mcpServices/McpProtocol';
 import type { AcpBackend, AcpBackendAll, AcpModelInfo, PresetAgentType } from '../types/acpTypes';
 import type { SlashCommandItem } from '../chat/slash/types';
-import type { IMcpServer, IProvider, TChatConversation, TProviderWithModel, ICssTheme } from '../config/storage';
+import type {
+  IMcpServer,
+  IProvider,
+  InfisicalConfig,
+  TChatConversation,
+  TProviderWithModel,
+  ICssTheme,
+} from '../config/storage';
 import type { PreviewHistoryTarget, PreviewSnapshotInfo } from '../types/preview';
 import type {
   UpdateCheckRequest,
@@ -1277,4 +1284,13 @@ export const team = {
   agentSpawned: bridge.buildEmitter<import('@/common/types/teamTypes').ITeamAgentSpawnedEvent>('team.agent.spawned'),
   agentRemoved: bridge.buildEmitter<import('@/common/types/teamTypes').ITeamAgentRemovedEvent>('team.agent.removed'),
   agentRenamed: bridge.buildEmitter<import('@/common/types/teamTypes').ITeamAgentRenamedEvent>('team.agent.renamed'),
+};
+
+// Provider-level utilities
+export const providers = {
+  /** Test an Infisical secret fetch. Returns a masked preview on success. */
+  testInfisical: bridge.buildProvider<
+    { ok: true; preview: string } | { ok: false; error: string },
+    { infisicalConfig: InfisicalConfig }
+  >('providers.test-infisical'),
 };

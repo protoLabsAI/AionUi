@@ -42,6 +42,7 @@ import { initWeixinLoginBridge } from './weixinLoginBridge';
 import { initWorkspaceSnapshotBridge } from './workspaceSnapshotBridge';
 import { initRemoteAgentBridge } from './remoteAgentBridge';
 import { initHubBridge } from './hubBridge';
+import { initInfisicalBridge } from './infisicalBridge';
 import { initTeamBridge } from './teamBridge';
 import type { TeamSessionService } from '@process/team/TeamSessionService';
 
@@ -91,6 +92,7 @@ export function initAllBridges(deps: BridgeDependencies): void {
   initWorkspaceSnapshotBridge();
   initRemoteAgentBridge();
   initHubBridge();
+  initInfisicalBridge();
   initTeamBridge(deps.teamSessionService);
 }
 
@@ -137,6 +139,7 @@ export {
   initWebuiBridge,
   initRemoteAgentBridge,
   initHubBridge,
+  initInfisicalBridge,
   initTeamBridge,
   initWindowControlsBridge,
   initWeixinLoginBridge,
