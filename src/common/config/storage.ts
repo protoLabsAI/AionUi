@@ -443,12 +443,24 @@ export type ModelCapability = {
   isUserSelected?: boolean;
 };
 
+export type ApiKeySource = 'inline' | 'infisical';
+
+export type InfisicalConfig = {
+  projectId: string;
+  secretPath: string; // e.g. "/aionui/providers"
+  secretName: string; // e.g. "ANTHROPIC_API_KEY"
+  environment: string; // e.g. "prod"
+};
+
 export interface IProvider {
   id: string;
   platform: string;
   name: string;
   baseUrl: string;
   apiKey: string;
+  /** Source of the API key. Defaults to 'inline' when absent. */
+  apiKeySource?: ApiKeySource;
+  infisicalConfig?: InfisicalConfig;
   model: string[];
   /**
    * 模型能力标签列表。打了标签就是支持，没打就是不支持
