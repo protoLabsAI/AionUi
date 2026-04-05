@@ -203,3 +203,7 @@ dist-server/
 .omc/
 .superset/
 .claude/teams/aionui-ui-dev.json
+# Worktree directories (managed by protoLabs Studio)
+.automaker/
+.claude/worktrees/
+.automaker-lock
