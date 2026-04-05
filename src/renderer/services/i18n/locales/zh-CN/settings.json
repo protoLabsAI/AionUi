@@ -804,5 +804,17 @@
     "pendingTimeout": "审批请求已过期（5 分钟）。请重试。",
     "pendingCancel": "取消",
     "pendingTimeRemaining": "剩余时间：{{time}}"
+  },
+  "apiKeySource": "密钥来源",
+  "apiKeySource.inline": "API 密钥（内联）",
+  "apiKeySource.infisical": "Infisical 密钥",
+  "infisical": {
+    "projectId": "Infisical 项目 ID",
+    "environment": "环境",
+    "secretPath": "密钥路径",
+    "secretName": "密钥名称",
+    "testConnection": "测试连接",
+    "testSuccess": "连接成功 — 密钥预览：{{preview}}",
+    "testFailed": "连接失败：{{error}}"
   }
 }

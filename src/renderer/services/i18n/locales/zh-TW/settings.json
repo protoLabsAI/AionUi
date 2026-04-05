@@ -805,5 +805,17 @@
     "pendingTimeout": "審批請求已過期（5 分鐘）。請重試。",
     "pendingCancel": "取消",
     "pendingTimeRemaining": "剩餘時間：{{time}}"
+  },
+  "apiKeySource": "金鑰來源",
+  "apiKeySource.inline": "API 金鑰（內聯）",
+  "apiKeySource.infisical": "Infisical 密鑰",
+  "infisical": {
+    "projectId": "Infisical 專案 ID",
+    "environment": "環境",
+    "secretPath": "密鑰路徑",
+    "secretName": "密鑰名稱",
+    "testConnection": "測試連線",
+    "testSuccess": "連線成功 — 金鑰預覽：{{preview}}",
+    "testFailed": "連線失敗：{{error}}"
   }
 }

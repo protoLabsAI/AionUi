@@ -805,5 +805,17 @@
     "pendingTimeout": "승인 요청이 만료되었습니다 (5분). 다시 시도해주세요.",
     "pendingCancel": "취소",
     "pendingTimeRemaining": "남은 시간: {{time}}"
+  },
+  "apiKeySource": "키 소스",
+  "apiKeySource.inline": "API 키 (인라인)",
+  "apiKeySource.infisical": "Infisical 시크릿",
+  "infisical": {
+    "projectId": "Infisical 프로젝트 ID",
+    "environment": "환경",
+    "secretPath": "시크릿 경로",
+    "secretName": "시크릿 이름",
+    "testConnection": "연결 테스트",
+    "testSuccess": "연결 성공 — 키 미리보기: {{preview}}",
+    "testFailed": "연결 실패: {{error}}"
   }
 }

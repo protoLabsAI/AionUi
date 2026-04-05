@@ -4,7 +4,7 @@ import { ipcBridge } from '@/common';
 import { uuid } from '@/common/utils';
 import { isGoogleApisHost } from '@/common/utils/urlValidation';
 import ModalHOC from '@/renderer/utils/ui/ModalHOC';
-import { Form, Input, Message, Select } from '@arco-design/web-react';
+import { Button, Form, Input, Message, Select } from '@arco-design/web-react';
 import { LinkCloud, Edit, Search, Loading } from '@icon-park/react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -223,6 +223,13 @@ const AddPlatformModal = ModalHOC<{
   const modelValue = Form.useWatch('model', form);
   const bedrockAuthMethod = Form.useWatch('bedrockAuthMethod', form);
   const _bedrockRegion = Form.useWatch('bedrockRegion', form);
+  const apiKeySource = Form.useWatch('apiKeySource', form) ?? 'inline';
+
+  // Infisical test connection state
+  const [infisicalTestStatus, setInfisicalTestStatus] = useState<
+    { ok: true; preview: string } | { ok: false; error: string } | null
+  >(null);
+  const [infisicalTesting, setInfisicalTesting] = useState(false);
 
   // 获取当前选中的平台配置 / Get current selected platform config
   const selectedPlatform = useMemo(() => getPlatformByValue(platformValue), [platformValue]);
@@ -303,9 +310,11 @@ const AddPlatformModal = ModalHOC<{
       form.resetFields();
       form.setFieldValue('bedrockAuthMethod', 'accessKey');
       form.setFieldValue('bedrockRegion', 'us-east-1');
+      form.setFieldValue('apiKeySource', 'inline');
       protocolDetection.reset();
       setLastDetectionInput(null); // 重置检测记录 / Reset detection record
       setModelProtocol('openai'); // 重置协议选择 / Reset protocol selection
+      setInfisicalTestStatus(null);
 
       // Pre-fill from deep link data (aionui:// protocol)
       if (deepLinkData?.baseUrl || deepLinkData?.apiKey) {
@@ -342,6 +351,7 @@ const AddPlatformModal = ModalHOC<{
         const name = selectedPlatform?.i18nKey
           ? t(selectedPlatform.i18nKey)
           : (selectedPlatform?.name ?? values.platform);
+        const apiKeySourceVal = isBedrock ? undefined : ((values.apiKeySource as string) ?? 'inline');
         const provider: IProvider = {
           id: uuid(),
           platform: selectedPlatform?.platform ?? 'custom',
@@ -349,7 +359,14 @@ const AddPlatformModal = ModalHOC<{
           // 优先使用用户输入的 baseUrl，否则使用平台预设值
           // Prefer user input baseUrl, fallback to platform preset
           baseUrl: isBedrock ? '' : values.baseUrl || selectedPlatform?.baseUrl || '',
-          apiKey: isBedrock ? '' : values.apiKey,
+          apiKey: apiKeySourceVal === 'infisical' ? '' : (isBedrock ? '' : values.apiKey),
+          apiKeySource: apiKeySourceVal as IProvider['apiKeySource'],
+          infisicalConfig: apiKeySourceVal === 'infisical' ? {
+            projectId: values.infisicalProjectId as string,
+            environment: values.infisicalEnvironment as string,
+            secretPath: values.infisicalSecretPath as string,
+            secretName: values.infisicalSecretName as string,
+          } : undefined,
           model: [values.model],
         };
 
@@ -449,12 +466,25 @@ const AddPlatformModal = ModalHOC<{
             />
           </Form.Item>
 
-          {/* API Key */}
+          {/* API Key Source */}
           <Form.Item
             hidden={isBedrock}
+            label={t('settings.apiKeySource')}
+            field={'apiKeySource'}
+            initialValue='inline'
+          >
+            <Select>
+              <Select.Option value='inline'>{t('settings.apiKeySource.inline')}</Select.Option>
+              <Select.Option value='infisical'>{t('settings.apiKeySource.infisical')}</Select.Option>
+            </Select>
+          </Form.Item>
+
+          {/* API Key */}
+          <Form.Item
+            hidden={isBedrock || apiKeySource === 'infisical'}
             label={t('settings.apiKey')}
-            required={!isBedrock}
-            rules={[{ required: !isBedrock }]}
+            required={!isBedrock && apiKeySource !== 'infisical'}
+            rules={[{ required: !isBedrock && apiKeySource !== 'infisical' }]}
             field={'apiKey'}
             extra={
               <div className='space-y-2px'>
@@ -484,6 +514,96 @@ const AddPlatformModal = ModalHOC<{
                 />
               }
             />
+          </Form.Item>
+
+          {/* Infisical Project ID */}
+          <Form.Item
+            hidden={isBedrock || apiKeySource !== 'infisical'}
+            label={t('settings.infisical.projectId')}
+            field={'infisicalProjectId'}
+            required={!isBedrock && apiKeySource === 'infisical'}
+            rules={[{ required: !isBedrock && apiKeySource === 'infisical' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          {/* Infisical Environment */}
+          <Form.Item
+            hidden={isBedrock || apiKeySource !== 'infisical'}
+            label={t('settings.infisical.environment')}
+            field={'infisicalEnvironment'}
+            initialValue='prod'
+            required={!isBedrock && apiKeySource === 'infisical'}
+            rules={[{ required: !isBedrock && apiKeySource === 'infisical' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          {/* Infisical Secret Path */}
+          <Form.Item
+            hidden={isBedrock || apiKeySource !== 'infisical'}
+            label={t('settings.infisical.secretPath')}
+            field={'infisicalSecretPath'}
+            initialValue='/'
+            required={!isBedrock && apiKeySource === 'infisical'}
+            rules={[{ required: !isBedrock && apiKeySource === 'infisical' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          {/* Infisical Secret Name */}
+          <Form.Item
+            hidden={isBedrock || apiKeySource !== 'infisical'}
+            label={t('settings.infisical.secretName')}
+            field={'infisicalSecretName'}
+            required={!isBedrock && apiKeySource === 'infisical'}
+            rules={[{ required: !isBedrock && apiKeySource === 'infisical' }]}
+            extra={
+              !isBedrock && apiKeySource === 'infisical' ? (
+                <div className='mt-4px space-y-4px'>
+                  <Button
+                    type='outline'
+                    size='small'
+                    loading={infisicalTesting}
+                    onClick={async () => {
+                      const values = form.getFields();
+                      if (!values.infisicalProjectId || !values.infisicalEnvironment || !values.infisicalSecretPath || !values.infisicalSecretName) {
+                        message.warning(t('settings.bedrock.fillRequiredFields'));
+                        return;
+                      }
+                      setInfisicalTesting(true);
+                      setInfisicalTestStatus(null);
+                      try {
+                        const res = await ipcBridge.providers.testInfisical.invoke({
+                          infisicalConfig: {
+                            projectId: values.infisicalProjectId as string,
+                            environment: values.infisicalEnvironment as string,
+                            secretPath: values.infisicalSecretPath as string,
+                            secretName: values.infisicalSecretName as string,
+                          },
+                        });
+                        setInfisicalTestStatus(res);
+                      } catch (error: unknown) {
+                        setInfisicalTestStatus({ ok: false, error: (error as Error).message || String(error) });
+                      } finally {
+                        setInfisicalTesting(false);
+                      }
+                    }}
+                  >
+                    {t('settings.infisical.testConnection')}
+                  </Button>
+                  {infisicalTestStatus && (
+                    <div className={`text-12px mt-2px ${infisicalTestStatus.ok ? 'text-success' : 'text-danger'}`}>
+                      {infisicalTestStatus.ok
+                        ? t('settings.infisical.testSuccess', { preview: infisicalTestStatus.preview })
+                        : t('settings.infisical.testFailed', { error: (infisicalTestStatus as { ok: false; error: string }).error })}
+                    </div>
+                  )}
+                </div>
+              ) : undefined
+            }
+          >
+            <Input />
           </Form.Item>
 
           {/* AWS Bedrock Authentication Method */}

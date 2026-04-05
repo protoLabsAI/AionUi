@@ -803,5 +803,17 @@
     "pendingTimeout": "Approval request expired (5 minutes). Please try again.",
     "pendingCancel": "Cancel",
     "pendingTimeRemaining": "Time remaining: {{time}}"
+  },
+  "apiKeySource": "Key Source",
+  "apiKeySource.inline": "API Key (inline)",
+  "apiKeySource.infisical": "Infisical Secret",
+  "infisical": {
+    "projectId": "Infisical Project ID",
+    "environment": "Environment",
+    "secretPath": "Secret Path",
+    "secretName": "Secret Name",
+    "testConnection": "Test Connection",
+    "testSuccess": "Connected — key preview: {{preview}}",
+    "testFailed": "Connection failed: {{error}}"
   }
 }

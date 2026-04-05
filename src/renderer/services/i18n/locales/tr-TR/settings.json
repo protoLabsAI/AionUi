@@ -803,5 +803,17 @@
     "pendingTimeout": "Onay isteği süresi doldu (5 dakika). Lütfen tekrar deneyin.",
     "pendingCancel": "İptal",
     "pendingTimeRemaining": "Kalan süre: {{time}}"
+  },
+  "apiKeySource": "Anahtar Kaynağı",
+  "apiKeySource.inline": "API Anahtarı (satır içi)",
+  "apiKeySource.infisical": "Infisical Sırrı",
+  "infisical": {
+    "projectId": "Infisical Proje ID",
+    "environment": "Ortam",
+    "secretPath": "Sır Yolu",
+    "secretName": "Sır Adı",
+    "testConnection": "Bağlantıyı Test Et",
+    "testSuccess": "Bağlandı — anahtar önizleme: {{preview}}",
+    "testFailed": "Bağlantı başarısız: {{error}}"
   }
 }

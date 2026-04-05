@@ -805,5 +805,17 @@
     "pendingTimeout": "承認リクエストの期限が切れました（5分）。再試行してください。",
     "pendingCancel": "キャンセル",
     "pendingTimeRemaining": "残り時間：{{time}}"
+  },
+  "apiKeySource": "キーソース",
+  "apiKeySource.inline": "API キー（インライン）",
+  "apiKeySource.infisical": "Infisical シークレット",
+  "infisical": {
+    "projectId": "Infisical プロジェクト ID",
+    "environment": "環境",
+    "secretPath": "シークレットパス",
+    "secretName": "シークレット名",
+    "testConnection": "接続テスト",
+    "testSuccess": "接続成功 — キープレビュー：{{preview}}",
+    "testFailed": "接続失敗：{{error}}"
   }
 }
