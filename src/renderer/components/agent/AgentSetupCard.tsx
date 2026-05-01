@@ -20,20 +20,22 @@ import type { AgentBackend } from '@/common/types/acpTypes';
 import type { AgentCheckResult } from '@/renderer/hooks/agent/useAgentReadinessCheck';
 
 // Agent logos
+import AionLogo from '@/renderer/assets/logos/brand/aion.svg';
+import AuggieLogo from '@/renderer/assets/logos/brand/auggie.svg';
 import ClaudeLogo from '@/renderer/assets/logos/ai-major/claude.svg';
 import CodeBuddyLogo from '@/renderer/assets/logos/tools/coding/codebuddy.svg';
 import CodexLogo from '@/renderer/assets/logos/tools/coding/codex.svg';
-import OpenCodeLogo from '@/renderer/assets/logos/tools/coding/opencode.svg';
-import GeminiLogo from '@/renderer/assets/logos/ai-major/gemini.svg';
-import QwenLogo from '@/renderer/assets/logos/ai-china/qwen.svg';
 import DroidLogo from '@/renderer/assets/logos/brand/droid.svg';
+import GeminiLogo from '@/renderer/assets/logos/ai-major/gemini.svg';
 import GooseLogo from '@/renderer/assets/logos/tools/goose.svg';
-import AuggieLogo from '@/renderer/assets/logos/brand/auggie.svg';
 import KimiLogo from '@/renderer/assets/logos/ai-china/kimi.svg';
+import OpenCodeLogo from '@/renderer/assets/logos/tools/coding/opencode.svg';
+import QwenLogo from '@/renderer/assets/logos/ai-china/qwen.svg';
 import SnowLogo from '@/renderer/assets/logos/tools/coding/snow.png';
 import { applyDefaultConversationName } from '@/renderer/pages/conversation/utils/newConversationName';
 
 const AGENT_LOGOS: Partial<Record<AgentBackend, string>> = {
+  aionrs: AionLogo,
   claude: ClaudeLogo,
   codebuddy: CodeBuddyLogo,
   codex: CodexLogo,
